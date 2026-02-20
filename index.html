@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PULSEFORGE | Forge Your Perfect Workout</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+            <div class="logo">PULSEFORGE</div>
+            <nav>
+                <a href="#features">Features</a>
+                <a href="#testimonials">Testimonials</a>
+                <a href="login.html" class="btn btn-secondary" style="padding: 8px 20px; margin-left: 20px;">Login</a>
+                <a href="register.html" class="btn btn-primary" style="padding: 8px 20px; margin-left: 10px;">Get Started</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1 class="animate">Forge Your <span>Perfect</span><br>Workout</h1>
+            <p class="animate" style="animation-delay: 0.2s;">Transform your physique with AI-powered plans, advanced progress tracking, and professional nutrition guidance.</p>
+            <div class="hero-btns animate" style="animation-delay: 0.4s;">
+                <a href="register.html" class="btn btn-primary">Start My Journey</a>
+                <a href="login.html" class="btn btn-secondary">Welcome Back</a>
+            </div>
+        </section>
+
+        <section id="features" class="features container">
+            <div class="section-title">
+                <h2>Premium Features</h2>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card glass">
+                    <i class="fas fa-robot"></i>
+                    <h3>Smart AI Plans</h3>
+                    <p>Dynamic workout routines tailored to your goals, experience level, and equipment availability.</p>
+                </div>
+                <div class="feature-card glass">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Progress Tracking</h3>
+                    <p>Visualize your gains with detailed charts and logs. Track weights, reps, and calories burned.</p>
+                </div>
+                <div class="feature-card glass">
+                    <i class="fas fa-apple-alt"></i>
+                    <h3>Nutrition Guide</h3>
+                    <p>Calculate your macros and get meal recommendations to fuel your performance.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="testimonials" class="features container" style="background: rgba(255,255,255,0.02); padding: 80px 40px; border-radius: 30px;">
+            <div class="section-title">
+                <h2>What Our Athletes Say</h2>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card glass">
+                    <p>"The glassmorphism UI is stunning, and the workout plans actually make sense for my schedule!"</p>
+                    <h4 style="margin-top:20px; color: var(--neon-cyan);">- Alex Johnson</h4>
+                </div>
+                <div class="feature-card glass">
+                    <p>"PULSEFORGE helped me track my BMI and strength gains in one place. No more messy spreadsheets."</p>
+                    <h4 style="margin-top:20px; color: var(--neon-cyan);">- Sarah Miller</h4>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer style="padding: 60px 0; border-top: 1px solid var(--glass-border); margin-top: 100px;">
+        <div class="container" style="text-align: center;">
+            <div class="logo" style="font-size: 1.5rem; margin-bottom: 20px;">PULSEFORGE</div>
+            <p style="color: var(--text-gray); margin-bottom: 30px;">Elevate your fitness game with the ultimate workout planner.</p>
+            <div class="social-links" style="font-size: 1.5rem; display: flex; justify-content: center; gap: 20px;">
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-facebook"></i></a>
+            </div>
+            <p style="color: var(--text-gray); font-size: 0.8rem; margin-top: 40px;">© 2024 PULSEFORGE. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Intersection Observer for scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.feature-card').forEach(card => observer.observe(card));
+    </script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Planner | PULSEFORGE</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        .sidebar {
+            padding: 40px 20px;
+            border-right: 1px solid var(--glass-border);
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            color: var(--text-gray);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: var(--transition);
+            margin-bottom: 10px;
+        }
+
+        .sidebar-nav a.active,
+        .sidebar-nav a:hover {
+            background: var(--bg-card);
+            color: var(--neon-lime);
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .planner-form {
+            max-width: 600px;
+            padding: 40px;
+        }
+
+        .plan-result {
+            margin-top: 40px;
+            display: none;
+        }
+
+        .workout-item {
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="logo">PULSEFORGE</div>
+            <div class="user-profile"><span id="userNameDisplay">User</span></div>
+        </div>
+    </header>
+
+    <div class="dashboard-layout container">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="planner.html" class="active"><i class="fas fa-calendar-alt"></i> Workout Planner</a>
+                <a href="library.html"><i class="fas fa-dumbbell"></i> Workout Library</a>
+                <a href="progress.html"><i class="fas fa-chart-line"></i> Progress Tracker</a>
+                <a href="#" onclick="api.logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h1>Workout Planner</h1>
+            <p style="color:var(--text-gray); margin-bottom: 30px;">Generate a customized plan based on your fitness
+                goals.</p>
+
+            <div class="planner-form glass">
+                <form id="planForm">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:block; margin-bottom:10px;">Fitness Goal</label>
+                        <select id="goal" class="glass"
+                            style="width:100%; padding:12px; color:white; border:1px solid var(--glass-border);">
+                            <option value="Muscle Gain">Muscle Gain</option>
+                            <option value="Weight Loss">Weight Loss</option>
+                            <option value="Endurance">Endurance</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:block; margin-bottom:10px;">Experience Level</label>
+                        <select id="level" class="glass"
+                            style="width:100%; padding:12px; color:white; border:1px solid var(--glass-border);">
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 30px;">
+                        <label style="display:block; margin-bottom:10px;">Days Per Week</label>
+                        <input type="number" id="days" value="3" min="1" max="7" class="glass"
+                            style="width:100%; padding:12px; color:white; border:1px solid var(--glass-border);">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%">Generate My Plan</button>
+                </form>
+            </div>
+
+            <div id="planResult" class="plan-result">
+                <h2 style="margin-bottom: 20px;">Your Custom Plan</h2>
+                <div id="planContainer"></div>
+                <button class="btn btn-secondary" style="margin-top:20px;" onclick="location.reload()">Reset</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        const user = api.getCurrentUser();
+        if (!user) window.location.href = 'login.html';
+        document.getElementById('userNameDisplay').innerText = user.fullName;
+
+        document.getElementById('planForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                username: user.username,
+                goal: document.getElementById('goal').value,
+                level: document.getElementById('level').value,
+                days: parseInt(document.getElementById('days').value)
+            };
+
+            try {
+                const plan = await api.post('/workouts/generate', data);
+                displayPlan(plan);
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        });
+
+        function displayPlan(plan) {
+            const container = document.getElementById('planContainer');
+            container.innerHTML = '';
+            plan.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'workout-item glass';
+                div.innerHTML = `
+                    <div>
+                        <h4 style="color:var(--neon-cyan)">${item.dayOfWeek}</h4>
+                        <p>${item.workout.name}</p>
+                    </div>
+                    <div style="text-align:right">
+                        <p>${item.sets} Sets | ${item.reps} Reps</p>
+                        <p style="font-size:0.8rem; color:var(--text-gray)">Rest: ${item.restTime}s</p>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            document.querySelector('.planner-form').style.display = 'none';
+            document.getElementById('planResult').style.display = 'block';
+            showToast('Plan generated and saved!', 'success');
+        }
+    </script>
+</body>
+
+</html>

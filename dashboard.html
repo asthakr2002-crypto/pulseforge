@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | PULSEFORGE</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        .sidebar {
+            padding: 40px 20px;
+            border-right: 1px solid var(--glass-border);
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            color: var(--text-gray);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: var(--transition);
+            margin-bottom: 10px;
+        }
+
+        .sidebar-nav a.active,
+        .sidebar-nav a:hover {
+            background: var(--bg-card);
+            color: var(--neon-lime);
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            padding: 25px;
+            text-align: center;
+        }
+
+        .stat-card h4 {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--neon-cyan);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .chart-container {
+            padding: 30px;
+            min-height: 300px;
+        }
+
+        .bmi-calculator {
+            padding: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="logo">PULSEFORGE</div>
+            <div class="user-profile" style="display:flex; align-items:center; gap:15px;">
+                <span id="userNameDisplay">User</span>
+                <i class="fas fa-user-circle" style="font-size: 1.5rem; color: var(--neon-lime);"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-layout container">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="planner.html"><i class="fas fa-calendar-alt"></i> Workout Planner</a>
+                <a href="library.html"><i class="fas fa-dumbbell"></i> Workout Library</a>
+                <a href="progress.html"><i class="fas fa-chart-line"></i> Progress Tracker</a>
+                <a href="#" onclick="api.logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h1 style="margin-bottom: 30px;">Welcome back, <span id="welcomeName"
+                    style="color: var(--neon-lime);">Athlete</span>!</h1>
+
+            <div class="stats-grid">
+                <div class="stat-card glass">
+                    <h4>Today's Goal</h4>
+                    <div class="value" id="todayGoal">Chest Day</div>
+                </div>
+                <div class="stat-card glass">
+                    <h4>Calories Burned</h4>
+                    <div class="value">450 <span style="font-size: 1rem;">kcal</span></div>
+                </div>
+                <div class="stat-card glass">
+                    <h4>Workout Streak</h4>
+                    <div class="value">5 <span style="font-size: 1rem;">days</span></div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="chart-container glass">
+                    <h3 style="margin-bottom: 20px;">Weekly Progress</h3>
+                    <canvas id="progressChart"></canvas>
+                </div>
+
+                <div class="bmi-calculator glass">
+                    <h3 style="margin-bottom: 20px;">BMI Calculator</h3>
+                    <div style="display:flex; flex-direction:column; gap:15px;">
+                        <input type="number" id="bmiWeight" placeholder="Weight (kg)" class="glass"
+                            style="padding:10px; color:white; border:1px solid var(--glass-border);">
+                        <input type="number" id="bmiHeight" placeholder="Height (cm)" class="glass"
+                            style="padding:10px; color:white; border:1px solid var(--glass-border);">
+                        <button onclick="calculateBMI()" class="btn btn-primary">Calculate BMI</button>
+                        <div id="bmiResult" style="margin-top:15px; font-size: 1.2rem; text-align:center;"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        const user = api.getCurrentUser();
+        if (!user) window.location.href = 'login.html';
+
+        document.getElementById('userNameDisplay').innerText = user.fullName;
+        document.getElementById('welcomeName').innerText = user.username;
+
+        // Progress Chart
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Minutes Trained',
+                    data: [45, 60, 0, 75, 50, 90, 30],
+                    borderColor: '#ccff00',
+                    tension: 0.4,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#a0a0a0' } },
+                    x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#a0a0a0' } }
+                },
+                plugins: { legend: { labels: { color: '#fff' } } }
+            }
+        });
+
+        function calculateBMI() {
+            const w = document.getElementById('bmiWeight').value;
+            const h = document.getElementById('bmiHeight').value / 100;
+            if (w && h) {
+                const bmi = (w / (h * h)).toFixed(1);
+                let cat = '';
+                if (bmi < 18.5) cat = 'Underweight';
+                else if (bmi < 25) cat = 'Healthy';
+                else if (bmi < 30) cat = 'Overweight';
+                else cat = 'Obese';
+                document.getElementById('bmiResult').innerHTML = `Your BMI: <span style="color:var(--neon-cyan)">${bmi}</span> (${cat})`;
+            }
+        }
+    </script>
+</body>
+
+</html>
