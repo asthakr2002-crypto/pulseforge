@@ -39,5 +39,3 @@
 - `src/main/resources/static`: Frontend (HTML/CSS/JS)
 - `src/main/resources/static/css/style.css`: Neon & Glassmorphism Design System
 - `src/main/resources/static/js/api.js`: Frontend API Handlers
-# pulseforge
-pulseforge
